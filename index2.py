@@ -84,10 +84,11 @@ def buscar_usuario(cpf):
 
     for usuario in usuarios:
         if usuario['CPF'] == cpf:
-            print(f"CPF: {usuario['cpf']}, NOME: {usuario['nome']}, NUMERO: {usuario['numero']}, OBSERVACOES: {usuario['observacoes']}, IDADE: {usuario['idade']}")
+            print(f"CPF: {usuario['CPF']}, NOME: {usuario['nome']}, NUMERO: {usuario['numero']}, OBSERVACOES: {usuario['observacoes']}, IDADE: {usuario['idade']}")
             encontrado = True
+            
     if not encontrado:
-            print("NENHUM USUÁRIO ENCONTRADO.")      
+            print("NENHUM USUÁRIO ENCONTRADO!")      
 
 def listar_usuarios():
     with open(arquivo2, 'r') as file:
@@ -405,15 +406,15 @@ def main():
                     opcao_usuario = input("ESCOLHA UMA OPÇÃO:\n>>> ")
 
                     if opcao_usuario == "1":
-                        cpf = float(input("Digite seu CPF: "))
+                        cpf = input("Digite seu CPF: ")
                         nome = input("Digite seu Nome: ")
                         numero_telefone = input("Digite seu número de telefone: ")
+                        observacoes = input("Observacao: ")
                         idade = int(input("Digite sua idade: "))
-                        observacoes = input("Se você tiver coisas que não pode comer: ")
-                        cadastrar_usuario(cpf, nome, numero_telefone, idade, observacoes)
+                        cadastrar_usuario(cpf, nome, numero_telefone, observacoes, idade)
 
                     elif opcao_usuario == "2":
-                        cpf = float(input("Digite seu CPF: "))
+                        cpf = input("Digite seu CPF: ")
                         usuario = login(cpf)
                         if(usuario):
                             print("LOGIN EFETUADO COM SUCESSO!")
@@ -428,23 +429,22 @@ def main():
                         break
 
                     elif opcao_usuario == "4":
-                        cpf_usuario = float(input("DIGITE O CPF DA PESSOA QUE SERA ATUALIZADO:\n>>>"))
+                        cpf_usuario = input("DIGITE O CPF DA PESSOA QUE SERA ATUALIZADO:\n>>>")
                         nome_novo = input("DIGITE O NOVO NOME:\n>>> ")
-                        numero_novo = float(input("DIGITE O NOVO NUMERO:\n>>> "))
+                        numero_novo = input("DIGITE O NOVO NUMERO:\n>>> ")
                         observacoes_novas = input("DIGITE A NOVA OBSERVACAO:\n>>> ")
-                        nova_idade = int(input("DIGITE A NOVA IDADE:\n>>> "))
-                        
-                        editar_usuario(cpf_usuario, nome_novo, numero_novo, nova_idade, observacoes_novas)
+                        nova_idade = int(input("DIGITE A NOVA IDADE:\n>>> "))              
+                        editar_usuario(cpf_usuario, nome_novo, numero_novo, observacoes_novas, nova_idade)
                     
                     elif opcao_usuario == "5":
-                        cpf = float(input("DIGITE O CPF QUE DESEJA EXCLUIR:\n>>> "))
+                        cpf = input("DIGITE O CPF QUE DESEJA EXCLUIR:\n>>> ")
                         excluir_usuario(cpf)
                         
                     elif opcao_usuario == "6":
                         listar_usuarios()
 
                     elif opcao_usuario == "7":
-                        cpf = float(input("DIGITE O CPF DO USUÁRIO:\n>>>"))
+                        cpf = input("DIGITE O CPF DO USUÁRIO:\n>>>")
                         buscar_usuario(cpf)
                         
                     elif opcao_usuario == "8":
