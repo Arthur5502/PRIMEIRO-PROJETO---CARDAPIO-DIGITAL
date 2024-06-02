@@ -95,14 +95,14 @@ def listar_usuarios():
         usuarios = json.load(file)
 
     if usuarios:
-        print("=" *60)
+        print("=" *80)
         print("LISTA DE USUÁRIOS:")
-        print("-" *60)
+        print("-" *80)
         for usuario in usuarios:
-            print("*" *60)
+            print("*" *80)
             print(f"CPF: {usuario['CPF']}, NOME: {usuario['nome']}, NUMERO: {usuario['numero']}, OBSERVACOES: {usuario['observacoes']}, IDADE: {usuario['idade']}")
-            print("*" *60)
-            print("=" *60)      
+            print("*" *80)
+            print("=" *80)      
 
 def verificar_arquivo_produto():
     if not os.path.exists(arquivo):
@@ -180,9 +180,8 @@ def verificar_arquivo_pedidos():
             json.dump([], f)
 
 def mostrar_menu(categoria):
-    with open(arquivo3, 'r', encoding="utf-8") as f:  # Especifica o encoding UTF-8
-        cardapio = json.load(f)  # Usa a variável correta 'cardapio'
-
+    with open(arquivo3, 'r', encoding="utf-8") as f: 
+        cardapio = json.load(f)  
     print(f"Menu de {categoria}:")
     for numero, item in cardapio[categoria].items():
         if categoria == "bebidas":
@@ -206,32 +205,32 @@ def fazer_pedido():
         menu_pedidos()
         opcao = input("ESCOLHA UMA OPÇÃO:\n>>> ")
 
-        if opcao == '6':  # Sair do menu de pedidos
+        if opcao == '6': 
             break
 
         if opcao in ["1", "2", "3", "5"]:
-            if opcao == "5":  # Resumo do pedido
+            if opcao == "5":  
                 mostrar_resumo(numero_pedido)
                 while True:
                     acao = input("Deseja confirmar (c), alterar quantidade (a) ou voltar (v)? ")
                     if acao.lower() == 'c':
-                        return  # Retorna ao menu principal após confirmar o pedido
+                        return  
                     elif acao.lower() == 'a':
                         editar_pedido(numero_pedido, cardapio)
                         mostrar_resumo(numero_pedido)
                     elif acao.lower() == 'v':
-                        break  # Volta para o menu de categorias
+                        break 
                     else:
                         print("Opção inválida. Tente novamente.")
-            else:  # Escolha de categoria
+            else:  
                 categoria = ["hamburgueres", "bebidas", "acompanhamentos"][int(opcao) - 1]
                 mostrar_menu(categoria)
-                while True:  # Loop para escolher itens dentro da categoria
+                while True: 
                     escolha = input(f"Escolha um item de {categoria} ou digite 'v' para voltar: ")
                     if escolha.lower() == 'v':
-                        break  # Volta para o menu de categorias
+                        break  
                     elif escolha == '5':
-                        continue  # Volta para o inicio do loop caso o usuário digite 5
+                        continue 
                     if escolha in cardapio[categoria]:
                         quantidade = int(input("Digite a quantidade: "))
                         item = cardapio[categoria][escolha]
@@ -256,8 +255,8 @@ def menu_pedidos():
     print("2. BEBIDAS")
     print("3. ACOMPANHAMENTOS")
     print("4. VOLTAR AO MENU ANTERIOR")
-    print("5. RESUMO DO PEDIDO")  # Mudança para a opção 5
-    print("6. SAIR")  # Mudança para a opção 
+    print("5. RESUMO DO PEDIDO")  
+    print("6. SAIR")  
     
 def mostrar_resumo(numero_pedido):
     print(f"\nResumo do pedido nº {numero_pedido}:")
@@ -271,10 +270,10 @@ def mostrar_resumo(numero_pedido):
     print(f"Valor total do pedido: R${total_valor:.2f}")
 
 def editar_pedido(numero_pedido, cardapio):
-    """Permite ao usuário editar a quantidade de itens em um pedido existente."""
+    
 
     while True:
-        mostrar_resumo(numero_pedido)  # Exibe o resumo antes de alterar
+        mostrar_resumo(numero_pedido)  
         item_para_alterar = input("Digite o número do item que deseja alterar ou 'A' para adicionar mais itens: ")
         if item_para_alterar.upper() == 'A':
             while True:
@@ -282,9 +281,9 @@ def editar_pedido(numero_pedido, cardapio):
                 opcao = input("Escolha a categoria para adicionar itens ou digite 'v' para voltar: ")
                 if opcao == 'v':
                     break
-                elif opcao == '5':  # Adicionei esta linha para tratar a opção 5
+                elif opcao == '5': 
                     mostrar_resumo(numero_pedido)
-                    continue  # Volta ao início do loop para adicionar itens
+                    continue  
                 if opcao in ["1", "2", "3"]:
                     categoria = ["hamburgueres", "bebidas", "acompanhamentos"][int(opcao) - 1]
                     mostrar_menu(categoria)
@@ -301,8 +300,8 @@ def editar_pedido(numero_pedido, cardapio):
                                 pedido[item['nome']] = {'quantidade': quantidade, 'kcal': item['kcal'], 'valor': item['valor']}
                         else:
                             print("Escolha inválida, tente novamente.")
-                    break  # Sai do loop de escolha de categoria após adicionar itens
-            mostrar_resumo(numero_pedido)  # Mostra o resumo após adicionar itens
+                    break  
+            mostrar_resumo(numero_pedido)  
         else:
             try:
                 item_para_alterar = int(item_para_alterar) - 1
@@ -315,7 +314,7 @@ def editar_pedido(numero_pedido, cardapio):
             except (ValueError, IndexError):
                 print("Item não encontrado no pedido.")
         
-        # Pergunta se o usuário deseja continuar alterando
+        
         continuar_alterando = input("Deseja alterar outro item? (S/N): ")
         if continuar_alterando.upper() != 'S':
             break
@@ -491,8 +490,8 @@ def main():
                         print("OPÇÃO INVÁLIDA. TENTE NOVAMENTE!")
 
             case 3:  
-                fazer_pedido()  # Chama a função para fazer o pedido completo
-                pedido = {}  # Limpa o pedido após a finalização
+                fazer_pedido()  
+                pedido = {}  
 
             case 4:
                 print("🚀 SAINDO...")
