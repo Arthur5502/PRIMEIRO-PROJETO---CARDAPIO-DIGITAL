@@ -4,11 +4,7 @@ from time import sleep
 
 arquivo = os.path.join(os.path.dirname(__file__), 'codigo_produto.json')
 arquivo2 = os.path.join(os.path.dirname(__file__), 'cadastro_clientes.json')
-arquivo3 = os.path.join(os.path.dirname(__file__), 'pedidos.json')
-
-numero_pedido = 0
-contador_pedidos = 0
-pedido = {}
+arquivo3 = os.path.join(os.path.dirname(__file__), 'cardapio.json')
 
 class Cor:
     VERMELHO = '\033[91m'
@@ -74,7 +70,7 @@ def excluir_usuario(cpf):
 
     with open(arquivo2, 'w') as f:
         json.dump(usuarios, f, indent=4)
-        print("USUÁRIO EXCLUÍDO COM SUCESSO!")
+    print("USUÁRIO EXCLUÍDO COM SUCESSO!")
 
 def buscar_usuario(cpf):
     with open(arquivo2, 'r') as file:
@@ -176,155 +172,70 @@ def buscar_produto(codigo_produto):
 
 def verificar_arquivo_pedidos():
     if not os.path.exists(arquivo3):
-        with open(arquivo3, 'w') as f:
-            json.dump([], f)
+        with open(arquivo3, 'w') as file_:
+            json.dump([], file_)
 
-def mostrar_menu(categoria):
-    with open(arquivo3, 'r', encoding="utf-8") as f: 
-        cardapio = json.load(f)  
-    print(f"Menu de {categoria}:")
-    for numero, item in cardapio[categoria].items():
-        if categoria == "bebidas":
-            print(f"{numero}: {item['nome']} - {item['kcal']} kcal - Valor: R${item['valor']:.2f}")
-        elif categoria == "hamburgueres":
-            print(f"{numero}: {item['nome']} - Ingredientes: {item['ingredientes']} - {item['kcal']} kcal - Valor: R${item['valor']:.2f}")
-        elif categoria == "acompanhamentos":
-            print(f"{numero}: {item['nome']} - Porção: {item['porção']} - {item['kcal']} kcal - Valor: R${item['valor']:.2f}")
+def cadastro_pedidos(nome_cliente, numero_pedido, hamburguer, quantidade_hamburguer, bebida, quantidade_bebida, acompanhamento, quantidade_acompanhamento, observacao_pedido):
+    with open(arquivo3, 'r') as file_:
+        pedidos = json.load(file_)
 
-def fazer_pedido():
-    global contador_pedidos, pedido, numero_pedido
-    contador_pedidos += 1
-    numero_pedido = contador_pedidos
-    print(f"Pedido nº {numero_pedido}\n")
-    pedido = {}  
+    pedidos.append({'Nome': nome_cliente, 'Numero do pedido': numero_pedido, 'Hamburguer': hamburguer, 'Quantidade hamburguer': quantidade_hamburguer, 'Bebida': bebida, 'Quantidade bebida': quantidade_bebida, 'Acompanhamento': acompanhamento, 'Quantidade acompanhamento': quantidade_acompanhamento, 'Observacao do pedido': observacao_pedido})
 
-    with open(arquivo3, 'r', encoding="utf-8") as f:
-        cardapio = json.load(f)
+    with open(arquivo3, 'w') as file_:
+        json.dump(pedidos, file_, indent=4)
+    print("PEDIDO REALIZADO COM SUCESSO!")
 
-    while True:
-        menu_pedidos()
-        opcao = input("ESCOLHA UMA OPÇÃO:\n>>> ")
+def editar_pedido(numero_pedido, novo_hamburguer, nova_quantidade_hamburguer, nova_bebida, nova_quantidade_bebida, novo_acompanhamento, nova_quantidade_acompanhamento, nova_observacao_pedido):
+    with open(arquivo3, 'r') as file_:
+        pedidos = json.load(file_)
 
-        if opcao == '6': 
+    for pedido in pedidos:
+        if pedido['Numero do pedido'] == numero_pedido:
+            pedido['Hamburguer'] = novo_hamburguer
+            pedido['Quantidade hamburguer'] = nova_quantidade_hamburguer
+            pedido['Bebida'] = nova_bebida
+            pedido['Quantidade bebida'] = nova_quantidade_bebida
+            pedido['Acompanhamento'] = novo_acompanhamento
+            pedido['Quantidade acompanhamento'] = nova_quantidade_acompanhamento
+            pedido['Observacao do pedido'] = nova_observacao_pedido
             break
 
-        if opcao in ["1", "2", "3", "5"]:
-            if opcao == "5":  
-                mostrar_resumo(numero_pedido)
-                while True:
-                    acao = input("Deseja confirmar (c), alterar quantidade (a) ou voltar (v)? ")
-                    if acao.lower() == 'c':
-                        return  
-                    elif acao.lower() == 'a':
-                        editar_pedido(numero_pedido, cardapio)
-                        mostrar_resumo(numero_pedido)
-                    elif acao.lower() == 'v':
-                        break 
-                    else:
-                        print("Opção inválida. Tente novamente.")
-            else:  
-                categoria = ["hamburgueres", "bebidas", "acompanhamentos"][int(opcao) - 1]
-                mostrar_menu(categoria)
-                while True: 
-                    escolha = input(f"Escolha um item de {categoria} ou digite 'v' para voltar: ")
-                    if escolha.lower() == 'v':
-                        break  
-                    elif escolha == '5':
-                        continue 
-                    if escolha in cardapio[categoria]:
-                        quantidade = int(input("Digite a quantidade: "))
-                        item = cardapio[categoria][escolha]
-                        if item['nome'] in pedido:
-                            pedido[item['nome']]['quantidade'] += quantidade
-                        else:
-                            pedido[item['nome']] = {'quantidade': quantidade, 'kcal': item['kcal'], 'valor': item['valor']}
-                    else:
-                        print("Escolha inválida, tente novamente.")
-        else:
-            print("OPÇÃO INVÁLIDA. TENTE NOVAMENTE!")
+    with open(arquivo3, 'w') as file_:
+        json.dump(pedidos, file_, indent=4)
+    print("PEDIDO ATUALIZADO COM SUCESSO!")
 
+def excluir_pedido(numero_pedido):
+    with open(arquivo3, 'r') as file_:
+        pedidos = json.load(file_)
 
-    mostrar_resumo(numero_pedido)
-    editar_pedido(numero_pedido)
-    adicionar_comentario()
-    
-
-def menu_pedidos():
-    print("\nESSE É O NOSSO CARDÁPIO!")
-    print("1. HAMBURGUERES")
-    print("2. BEBIDAS")
-    print("3. ACOMPANHAMENTOS")
-    print("4. VOLTAR AO MENU ANTERIOR")
-    print("5. RESUMO DO PEDIDO")  
-    print("6. SAIR")  
-    
-def mostrar_resumo(numero_pedido):
-    print(f"\nResumo do pedido nº {numero_pedido}:")
-    total_kcal = 0
-    total_valor = 0
-    for i, (item, detalhes) in enumerate(pedido.items(), 1):
-        total_kcal += detalhes['kcal'] * detalhes['quantidade']
-        total_valor += detalhes['valor'] * detalhes['quantidade']
-        print(f"{i}. {detalhes['quantidade']}x {item} - {detalhes['kcal']} kcal - Valor: R${detalhes['valor'] * detalhes['quantidade']:.2f}")
-    print(f"Total de kcal do pedido: {total_kcal} kcal")
-    print(f"Valor total do pedido: R${total_valor:.2f}")
-
-def editar_pedido(numero_pedido, cardapio):
-    
-
-    while True:
-        mostrar_resumo(numero_pedido)  
-        item_para_alterar = input("Digite o número do item que deseja alterar ou 'A' para adicionar mais itens: ")
-        if item_para_alterar.upper() == 'A':
-            while True:
-                menu_pedidos()
-                opcao = input("Escolha a categoria para adicionar itens ou digite 'v' para voltar: ")
-                if opcao == 'v':
-                    break
-                elif opcao == '5': 
-                    mostrar_resumo(numero_pedido)
-                    continue  
-                if opcao in ["1", "2", "3"]:
-                    categoria = ["hamburgueres", "bebidas", "acompanhamentos"][int(opcao) - 1]
-                    mostrar_menu(categoria)
-                    while True:
-                        escolha = input(f"Escolha um item de {categoria} ou digite 'v' para voltar: ")
-                        if escolha == 'v':
-                            break
-                        if escolha in cardapio[categoria]:
-                            quantidade = int(input("Digite a quantidade: "))
-                            item = cardapio[categoria][escolha]
-                            if item['nome'] in pedido:
-                                pedido[item['nome']]['quantidade'] += quantidade
-                            else:
-                                pedido[item['nome']] = {'quantidade': quantidade, 'kcal': item['kcal'], 'valor': item['valor']}
-                        else:
-                            print("Escolha inválida, tente novamente.")
-                    break  
-            mostrar_resumo(numero_pedido)  
-        else:
-            try:
-                item_para_alterar = int(item_para_alterar) - 1
-                item_nome = list(pedido.keys())[item_para_alterar]
-                nova_quantidade = int(input("Digite a nova quantidade: "))
-                if nova_quantidade == 0:
-                    del pedido[item_nome]
-                else:
-                    pedido[item_nome]['quantidade'] = nova_quantidade
-            except (ValueError, IndexError):
-                print("Item não encontrado no pedido.")
-        
-        
-        continuar_alterando = input("Deseja alterar outro item? (S/N): ")
-        if continuar_alterando.upper() != 'S':
+    for pedido in pedidos:  
+        if pedido['Numero do pedido'] == numero_pedido:
+            pedidos.remove(pedido)
             break
-def adicionar_comentario():
-    comentario = input("Deseja adicionar um comentário ao pedido? (Deixe em branco para nenhum): ")
-    if comentario:
-        print(f"Comentário adicionado: {comentario}")
+
+    with open(arquivo3, 'w') as file_:
+        json.dump(pedidos, file_, indent=4)
+    print("PEDIDO EXCLUÍDO COM SUCESSO!")
+
+def listar_pedidos():
+    with open(arquivo3, 'r') as file_:
+        pedidos = json.load(file_)
+
+    if pedidos:
+        print("=" * 215)
+        print("LISTA DE PEDIDOS:")
+        print("=" * 215)
+        for pedido in pedidos:
+            print("*" * 215)
+            print(f"NOME: {pedido['Nome']}, NUMERO DO PEDIDO: {pedido['Numero do pedido']}, HAMBURGUER: {pedido['Hamburguer']}, QUANTIDADE HAMBURGUER: {pedido['Quantidade hamburguer']}, BEBIDA: {pedido['Bebida']}, QUANTIDADE BEBIDA: {pedido['Quantidade bebida']}, ACOMPANHAMENTO: {pedido['Acompanhamento']}, QUANTIDADE ACOMPANHAMENTO: {pedido['Quantidade acompanhamento']}, OBSERVACAO: {pedido['Observacao do pedido']}")
+            print("*" * 215)
+        print("=" * 215)
     else:
-        print("Nenhum comentário adicionado.")
-    print("Obrigado por fazer seu pedido!")
+        print("NENHUM PEDIDO CADASTRADO!.")
+
+def confirmar_pedido():
+    confirmacao = input("Deseja confirmar o pedido? (S/N): ").upper()
+    return confirmacao == 'S'
 
 def menu_inicial():
     print(Cor.AZUL + "=" * 65 + Cor.RESET)
@@ -356,44 +267,49 @@ def menu_produtos():
     print("6. VOLTAR AO MENU ANTERIOR")
 
 def menu_pedidos():
-    print("\nESSE É O NOSSO CARDÁPIO!")
-    print("\nESSE É O NOSSO CARDÁPIO!")
+    print("\n========== CARDÁPIO! ==========")
     print("1. HAMBURGUERES")
     print("2. BEBIDAS")
     print("3. ACOMPANHAMENTOS")
-    print("4. VOLTAR AO MENU ANTERIOR")
-    print("5. RESUMO DO PEDIDO")  
-    print("6. SAIR")  
+    print("4. FINALIZAR PEDIDO")
+    print("5. LISTAR PEDIDOS")
+    print("6. EDITAR PEDIDO")
+    print("7. EXCLUIR PEDIDO")  
+    print("8. VOLTAR AO MENU ANTERIOR")
+
 
 def menu_hamburguer():
-    print("1 -> CLASSICO (780cal) -> INGREDIENTES: pao brioche; hamburguer bovino(180g); queijo cheddar; alface; tomate; cebola; valor --> R$")
-    print("2 -> BACON MANIA (830cal) -> INGREDIENTES: pao australiano; hamburguer angus(180g); queijo mussarela; bacon; alface; tomate; cebola; molho barbecue; valor --> R$")
-    print("3 -> FRANGO GRELHADO (530cal) -> INGREDIENTES: pao brioche; carne de porco(180g); queijo gruyère; bacon; picles; molho mostarda; valor --> R$")
-    print("4 -> PORCO C/ QUEIJO (860cal) -> INGREDIENTES: pao integral; peito de frango grelhado(180g); queijo prato; presunto; tomate; alface; ketchup; valor --> R$")
-    print("5 -> EXPLOSAO DE SABOR (855cal) -> INGREDIENTES: pao australiano; hamburguer angus(180g); queijo cheddar; bacon; alface; tomate; maionese; valor --> R$")
-
-def menu_acompanhamento():
-    print("1. Batata Rústica; porção: 100g, cal: 200g, valor: 20.00")
-    print("2. Batata Canoa; porção: 100g cal: 220, valor: 20.00")
-    print("3. Batata Frita; porção: 100g, cal: 300, valor: 15.00")
-    print("4. Batata Bacon; porção: 100g, cal: 350, valor: 25.00")
-    print("5. Onion Rings; porção: 100g, cal: 250, valor: 20.00")
+    print("1. CLASSICO (780cal) => INGREDIENTES: pao brioche; hamburguer bovino(180g); queijo cheddar; alface; tomate; cebola; valor --> R$25.00")
+    print("2. BACON MANIA (830cal) => INGREDIENTES: pao australiano; hamburguer angus(180g); queijo mussarela; bacon; alface; tomate; cebola; molho barbecue; valor --> R$30.00")
+    print("3. FRANGO GRELHADO (530cal) => INGREDIENTES: pao brioche; carne de porco(180g); queijo gruyère; bacon; picles; molho mostarda; valor --> R$28.00")
+    print("4. PORCO C/ QUEIJO (860cal) => INGREDIENTES: pao integral; peito de frango grelhado(180g); queijo prato; presunto; tomate; alface; ketchup; valor --> R$27.00")
+    print("5. EXPLOSAO DE SABOR (855cal) => INGREDIENTES: pao australiano; hamburguer angus(180g); queijo cheddar; bacon; alface; tomate; maionese; valor --> R$32.00")
 
 def menu_bebida():
-    print("1. Água com gás, cal: 0, valor: 5.00")
-    print("2. Água sem gás, cal: 0, valor: 4.00")
-    print("3. Suco de Laranja, cal: 120, valor: 8.00")
-    print("4. Suco de Acerola, cal: 100, valor: 8.00")
-    print("5. Suco de Caja, cal: 110, valor: 8.50")
-    print("6. Guaraná Antarctica, cal: 150, valor: 10.00")
-    print("7. Coca-Cola, cal: 140, valor: 10.00")
-    print("8. Fanta, cal: 160, valor: 10.00")
+    print("1. Água com gás => cal: 0, valor --> R$5.00")
+    print("2. Água sem gás => cal: 0, valor --> R$4.00")
+    print("3. Suco de Laranja => cal: 120, valor --> R$8.00")
+    print("4. Suco de Acerola => cal: 100, valor --> R$8.00")
+    print("5. Suco de Caja => cal: 110, valor --> R$8.50")
+    print("6. Guarana Antartica => cal: 150, valor --> R$10.00")
+    print("7. Coca-Cola => cal: 140, valor --> R$10.00")
+    print("8. Fanta Laranja => cal: 160, valor --> R$10.00")
+
+def menu_acompanhamento():
+    print("1. Batata Rústica => porção: 100g, cal: 200g, valor --> R$20.00")
+    print("2. Batata Canoa => porção: 100g cal: 220, valor --> R$20.00")
+    print("3. Batata Frita => porção: 100g, cal: 300, valor --> R$15.00")
+    print("4. Batata Bacon => porção: 100g, cal: 350, valor --> R$25.00")
+    print("5. Onion Rings => porção: 100g, cal: 250, valor --> R$20.00")
+
 
 def main():
     verificar_arquivo_produto()
     verificar_arquivo_clientes()
     verificar_arquivo_pedidos()
     
+    contador_pedidos = 0
+
     while True:
         menu_inicial()
         escolha = int(input("ESCOLHA UMA OPÇÃO:\n>>> "))
@@ -490,8 +406,102 @@ def main():
                         print("OPÇÃO INVÁLIDA. TENTE NOVAMENTE!")
 
             case 3:  
-                fazer_pedido()  
-                pedido = {}  
+                    contador_pedidos += 1
+                    numero_pedido = contador_pedidos
+                    nome_cliente = input("Informe o seu nome:\n>>> ")
+                    print(f"Pedido nº {numero_pedido}\n")
+                            
+                    hamburguer = None
+                    quantidade_hamburguer = None
+                    bebida = None
+                    quantidade_bebida = None
+                    acompanhamento = None
+                    quantidade_acompanhamento = None
+                    observacao_pedido = None
+                        
+                    hamburguer_nome = {
+                        '1': 'CLASSICO',
+                        '2': 'BACON MANIA',
+                        '3': 'FRANGO GRELHADO',
+                        '4': 'PORCO C/ QUEIJO',
+                        '5': 'EXPLOSAO DE SABOR'
+                    }
+                    bebida_nome = {
+                        '1': 'AGUA COM GAS',
+                        '2': 'AGUA SEM GAS',
+                        '3': 'SUCO DE LARANJA',
+                        '4': 'SUCO DE ACEROLA',
+                        '5': 'SUCO DE CAJA',
+                        '6': 'GUARANA ANTARTICA',
+                        '7': 'COCA-COLA',
+                        '8': 'FANTA LARANJA'
+                    }
+                    acompanhamento_nome = {
+                        '1': 'BATATA RUSTICA',
+                        '2': 'BATATA CANOA',
+                        '3': 'BATATA FRITA',
+                        '4': 'BATATA BACON',
+                        '5': 'ONION RINGS'
+                    }
+                    while True:
+                        menu_pedidos()
+                        opcao_pedidos = input("ESCOLHA UMA OPÇÃO:\n>>> ")
+
+                        if opcao_pedidos == '1':
+                            menu_hamburguer()
+                            opcao_hamburguer = input("ESCOLHA UMA OPÇÃO:\n>>> ")
+                            hamburguer = hamburguer_nome.get(opcao_hamburguer, "OPCAO INVALIDA")
+                            quantidade_hamburguer = int(input("Informe a quantidade desejada:\n>>> "))
+                            observacao_pedido = input("Observacao:\n>>> ")
+                            
+                        elif opcao_pedidos == '2':
+                            menu_bebida()
+                            opcao_bebida = input("ESCOLHA UMA OPÇÃO:\n>>> ")
+                            bebida = bebida_nome.get(opcao_bebida, "OPCAO INVALIDA")
+                            quantidade_bebida = int(input("Informe a quantidade desejada:\n>>> "))
+                                    
+                        elif opcao_pedidos == '3':
+                            menu_acompanhamento()
+                            opcao_acompanhamento = input("ESCOLHA UMA OPÇÃO:\n>>> ")
+                            acompanhamento = acompanhamento_nome.get(opcao_acompanhamento, "OPCAO INVALIDA")
+                            quantidade_acompanhamento = int(input("Informe a quantidade desejada:\n>>> "))
+                            
+                        elif opcao_pedidos == '4':
+                            print(f"Resumo do pedido nº {numero_pedido}:")
+                            print(f"Nome: {nome_cliente}")
+                            print(f"Hamburguer: {hamburguer} - Quantidade: {quantidade_hamburguer}")
+                            print(f"Bebida: {bebida} - Quantidade: {quantidade_bebida}")
+                            print(f"Acompanhamento: {acompanhamento} - Quantidade: {quantidade_acompanhamento}")
+                            print(f"Observacao do pedido: {observacao_pedido}")
+
+                            if confirmar_pedido():
+                                cadastro_pedidos(nome_cliente, numero_pedido, hamburguer, quantidade_hamburguer, bebida, quantidade_bebida, acompanhamento, quantidade_acompanhamento, observacao_pedido)
+                                break
+
+                        elif opcao_pedidos == '5':
+                            listar_pedidos()
+
+                        elif opcao_pedidos == '6':
+                            numero_pedido = int(input("Numero do pedido a ser editado:\n>>> "))
+                            novo_hamburguer = input("Novo Hamburguer:\n>>> ")
+                            nova_quantidade_hamburguer = int(input("Nova quantidade:\n>>> "))
+                            nova_bebida = input("Nova Bebida:\n>>> ")
+                            nova_quantidade_bebida = int(input("Nova quantidade:\n>>> "))
+                            novo_acompanhamento = input("Novo Acompanhamento:\n>>> ")
+                            nova_quantidade_acompanhamento = int(input("Nova quantidade:\n>>> "))
+                            nova_observacao_pedido = input("Nova observacao:\n>>> ")
+                            editar_pedido(numero_pedido, novo_hamburguer, nova_quantidade_hamburguer, nova_bebida, nova_quantidade_bebida, novo_acompanhamento, nova_quantidade_acompanhamento, nova_observacao_pedido)
+                                          
+                        elif opcao_pedidos == '7':
+                            numero_pedido = int(input("DIGITE O NUMERO DO PEDIDO QUE DESEJA EXCLUIR:\n>>> "))
+                            excluir_pedido(numero_pedido)
+
+                        elif opcao_pedidos == '8':
+                            print("VOLTAR AO MENU ANTERIOR...")
+                            break
+
+                        else:
+                            print("OPÇÃO INVÁLIDA! Por favor, escolha uma opção válida.")
 
             case 4:
                 print("🚀 SAINDO...")
