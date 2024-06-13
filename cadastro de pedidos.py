@@ -1,5 +1,6 @@
 import os
 import json
+from time import sleep
 
 class Cor:
     VERMELHO = '\033[91m'
@@ -74,6 +75,19 @@ def listar_pedidos():
         print("=" * 215)
     else:
         print("NENHUM PEDIDO CADASTRADO!.")
+
+def buscar_pedido (numero_pedido):
+    with open(arquivo3, 'r') as file_:
+        pedidos = json.load(file_)
+    
+    encontrado = False
+
+    for pedido in pedidos:
+        if pedido['Numero do pedido'] == numero_pedido:
+            print(f"NOME: {pedido['Nome']}, NUMERO DO PEDIDO: {pedido['Numero do pedido']}, HAMBURGUER: {pedido['Hamburguer']}, QUANTIDADE HAMBURGUER: {pedido['Quantidade hamburguer']}, BEBIDA: {pedido['Bebida']}, QUANTIDADE BEBIDA: {pedido['Quantidade bebida']}, ACOMPANHAMENTO: {pedido['Acompanhamento']}, QUANTIDADE ACOMPANHAMENTO: {pedido['Quantidade acompanhamento']}, OBSERVACAO: {pedido['Observacao do pedido']}")
+            encontrado = True
+    if not encontrado:
+            print("NENHUM PEDIDO ENCONTRADO")
 
 def confirmar_pedido():
     confirmacao = input("Deseja confirmar o pedido? (S/N): ").upper()
@@ -233,7 +247,12 @@ def main():
                     excluir_pedido(numero_pedido)
 
                 elif opcao_pedidos == '8':
+                    numero_pedido = int(input("DIGITE O NUMERO DO PEDIDO:\n>>> "))
+                    buscar_pedido(numero_pedido)
+
+                elif opcao_pedidos == '9':
                     print("VOLTAR AO MENU ANTERIOR...")
+                    sleep(3)
                     break
 
                 else:
