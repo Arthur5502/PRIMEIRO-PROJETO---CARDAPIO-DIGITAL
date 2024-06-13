@@ -522,6 +522,7 @@ def main():
 
                         elif opcao_pedidos == '9':
                             print("VOLTAR AO MENU ANTERIOR...")
+                            sleep(3)
                             break
 
                         else:
